@@ -17,7 +17,7 @@ since here are used no wrappers, the version 1.0 works this way:
 	-perform a dry run to check if everything is all right: snakemake -n --cores 1
 	-perform the run (glhf): snakemake --cores 1
 
-this version supports the following functions:
+this version supports the following features:
 
 	-maps your reads to the reference genome using bwa mem, creating a bam file in 
 	 the "mapped" directory
