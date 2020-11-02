@@ -1,0 +1,19 @@
+configfile: "config.yaml"
+
+
+## Target rules ##
+
+rule all:
+    input:
+        "snpeff/a.vcf",
+        "qc/fastqc/a.html"
+
+## Modules ##
+
+include: "rules/mapping.smk"
+include: "rules/fastqc.smk"
+include: "rules/adjusting.smk"
+include: "rules/sortindex.smk"
+include: "rules/calling.smk"
+include: "rules/annotating.smk"
+
