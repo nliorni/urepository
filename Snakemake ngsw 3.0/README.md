@@ -5,7 +5,7 @@ Greetings,
 in this version wrappers will be used.
 
 You are provided with a "data" directory, which contains a "samples" directory, and with a file called "environment.yaml".
-Put your genome.fa (you have to rename it)(must be indexed with bwa index and samtools faidx) in "data", and your samples in "samples" (you must rename your sample (rename with "a_1(2).fastq")
+Put your samples in "samples" (you must rename your sample (rename with "a_1(2).fastq")
 
 You need to have Conda installed on your system.
 
