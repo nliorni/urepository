@@ -1,19 +1,27 @@
 configfile: "config.yaml"
-
+SAMPLES = ["a"] #add as many letters as the sample you have -> RENAME YOUR SAMPLES x_1.fastq e x_2.fastq
 
 ## Target rules ##
 
 rule all:
     input:
-        "snpeff/a.vcf",
-        "qc/fastqc/a.html"
+        "annotated/all_annotated.csv",
+        expand("qc/fastqc/{sample}.html", sample=SAMPLES),
+        expand("stats/{sample}_samtools_stats.csv", sample=SAMPLES),
+        expand("stats/{sample}_bedtools_stats.csv", sample=SAMPLES),
+        expand("recal/{sample}.bam", sample=SAMPLES),
+        expand("meqc/{sample}_meqc_stats.txt", sample=SAMPLES),
+        expand("stats/{sample}.cov", sample=SAMPLES)
+        #"icov/a_output_file.xlsx"
+    message:
+        "Your work is done :DD"
 
 ## Modules ##
 
-include: "rules/mapping.smk"
 include: "rules/fastqc.smk"
+include: "rules/mapping.smk"
 include: "rules/adjusting.smk"
+include: "rules/scripts.smk"
 include: "rules/sortindex.smk"
 include: "rules/calling.smk"
 include: "rules/annotating.smk"
-
