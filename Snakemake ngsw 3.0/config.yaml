@@ -1,0 +1,7 @@
+#edit the paths as nedeed
+
+reference: "../workflow_data/hg38/hg38_ucsc_filtered.fa"
+bed: "resources/bed/regions.bed"
+filtered: "../workflow_data/hg38/hg38_ucsc_filtered_genomeFile.txt"
+dict: "../workflow_data/hg38/hg38_ucsc_filtered.dict"
+snpdb: "resources/db/dummysnp.vcf"
