@@ -1,8 +1,10 @@
+
 Greetings,
 
+in this version wrappers will be used.
 
-You are provided with a "data" directory, which contains a "samples" directory, and with files, called "environment.yaml", "config.json" and "workflow.json"
-Put your samples in "samples" and rename your them with "x_1(2).fastq" where x is a letter in [a-z]. Edit the config file with the path of your files. 
+You are provided with a "data" directory, which contains a "samples" directory, and with a file called "environment.yaml".
+Put your genome.fa (you have to rename it)(must be indexed with bwa index and samtools faidx) in "data", and your samples in "samples" (you can rename your sample (rename with "a_1(2).fastq")
 
 You need to have Conda installed on your system.
 
@@ -10,21 +12,18 @@ Now, put yourself in the main directory and activate the minimal Snakemake envir
 
 	
 	   		conda env create --name Snakemake-yourjob -f environment.yaml
-	   		
 	   
 With wrappers, all the others packages needed will be provided and installed in your conda environment. 
 Here is provided a run.py python script, which handles the run of the Snakefile for you. So, type:
 
-
 	   		./run.py  -h  (for help)
 
-
-You are able to limit the workflow to your necessities. This workflow supports "workflow.json" files. Choose the workflow and specify it via command line in the following way:
-
+You are able to limit the workflow to your necessities. This workflow supports "workflow.json" files, and you should have
+several different files. Choose the workflow and specify it via command line in the following way:
 
 			./run.py <workflowfile.json> -c 
-			
 
+Look at how the workflowfile.json is made for a better understanding. 
 In this "alpha" phase, we have 4 standar options: Mapping, Calling, Annotating and Complete. 
 You can edit one single workflow file, or you may have multiple files, one for each workflow. 
 If this, for some reason, does not work, simply hard type:
@@ -34,13 +33,13 @@ If this, for some reason, does not work, simply hard type:
 
 For the DAG of jobs, type:
 
-			./run.py -d | dot -Tsvg > dag.svg
-			
-			
-the expected output should be:
+			./run.py <workflowfile.json> -d | dot -Tsvg > dag.svg
+
+the expected output should be:  (some of those are now temporary)
 	
 	-a "qc" directory with the .zip and .html report of fastqc
 	-a "meqc" directory with the results of the MEQC.R script
+	-an "icov" directory with the output of iCoverage
 	-a "mapped_reads" directory which contains the .bam file (fastq reference genome mapping)
 	-a "reheaded_reads" with the reheaded .bam file (reheading)
 	-a "dedup" directory which contains the .bam files without duplicates, and a metrics.txt file (remove (pcr) duplicates)
@@ -52,6 +51,8 @@ the expected output should be:
 	-a "genotyped" directory which contains the genotyped vcf from the combined gvcf
 	-a "log" directory wich contains all the error messages you might encounter
 	-a "stats" directory with some stats to be processed by scripts (work in progress)
+	-a "sift_annotated" directory with the output of snpsift annotate
+	-a "sift_vartyped" directory with the output of snpsift vartype
 
 UPDATES:
 	
@@ -60,6 +61,8 @@ UPDATES:
 	
 future improvements:
 	
+	-add SNPSift dbNSFP wrapper rule
 	-use costumized SNPeff databases
 	-upgrade gatk call with deepvariant (the wrapper is currently not working)
 	-add a BED file to limit the calling in gatk HaplotypeCaller
+
