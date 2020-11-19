@@ -70,4 +70,4 @@ rule icoverage:
     message:
         "Creating {output} from {input} using iCoverage script"
     shell:
-        "python3 /scripts/icoverage.py -c {input} -t 30 -o {output}"
+        "python3 scripts/icoverage.py -c {input} -t 30 -o {output}"
