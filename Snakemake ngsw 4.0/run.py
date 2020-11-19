@@ -61,13 +61,14 @@ def main(args):
     
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Python executable for Snakemake workflows', usage='''./run.py <workflow_file> -argument
+
              ____
             / . .\\                 
-            \    ---<
+            \    ---< "Snake crawls... Snakemake workflows"
              \  /
    __________/ /
 -=:___________/
-Snakemake workflows
+
      ''')
 
     parser.add_argument('workflowfile')
