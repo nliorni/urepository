@@ -71,7 +71,7 @@ if __name__ == '__main__':
 
      ''')
 
-    parser.add_argument('workflowfile')
+    parser.add_argument('workflowfile', help='specify the chosen workflow.json file')
     parser.add_argument('-n', '--dry-run', action='store_true', help='run Snakemake in dry-run mode')
     parser.add_argument('-c', '--use-conda', action='store_true', help='use Conda environment for wrappers')
     parser.add_argument('-u', '--unlock', action='store_true', help='unlock the current working directory')
