@@ -1,0 +1,58 @@
+configfile: "config.json"
+SAMPLES = ["a", "b"] #add as many letters as the number of samples you have 
+#-> RENAME YOUR SAMPLES x_1.fastq e x_2.fastq and put them in data/samples
+
+
+## Target rules ##
+
+rule all:
+    input:
+        expand("recal/{sample}.bam", sample=SAMPLES),
+        expand("qc/fastqc/{sample}.html", sample=SAMPLES),
+        expand("mapped_reads/{sample}.bam", sample=SAMPLES),
+        "genotyped/all.vcf",
+        "sift_vartyped/all_annotated.csv",
+        expand("meqc/{sample}_meqc_stats.txt", sample=SAMPLES),
+        expand("icov/{sample}_output_file.xlsx", sample=SAMPLES)
+    message:
+        "Flowers"
+
+rule mapping:
+    input:
+        expand("qc/fastqc/{sample}.html", sample=SAMPLES),
+        expand("mapped_reads/{sample}.bam", sample=SAMPLES)
+    message:
+        "So many of the same"
+
+rule calling:
+    input:
+        expand("qc/fastqc/{sample}.html", sample=SAMPLES),
+        "genotyped/all.vcf"
+    message:
+        "So many unneded"
+
+rule annotating:
+    input:
+        expand("qc/fastqc/{sample}.html", sample=SAMPLES),
+        "sift_vartyped/all_annotated.csv"
+    message:
+        "God's in his heaven"
+
+rule complete:
+    input:
+        expand("qc/fastqc/{sample}.html", sample=SAMPLES),
+        "sift_vartyped/all_annotated.csv",
+        expand("meqc/{sample}_meqc_stats.txt", sample=SAMPLES),
+        expand("icov/{sample}_output_file.xlsx", sample=SAMPLES)
+    message:
+        "All's right with the world"
+
+## Modules ##
+
+include: "rules/mapping.smk"
+include: "rules/fastqc.smk"
+include: "rules/adjusting.smk"
+include: "rules/sortindex.smk"
+include: "rules/calling.smk"
+include: "rules/annotating.smk"
+include: "rules/scripts.smk"
