@@ -1,4 +1,3 @@
-configfile: "config.json"
 SAMPLES = ["a", "b"] #add as many letters as the number of samples you have 
 #-> RENAME YOUR SAMPLES x_1.fastq e x_2.fastq and put them in data/samples
 
@@ -29,7 +28,7 @@ rule calling:
         expand("qc/fastqc/{sample}.html", sample=SAMPLES),
         "genotyped/all.vcf"
     message:
-        "So many unneded"
+        "So many unneeded"
 
 rule annotating:
     input:
