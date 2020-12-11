@@ -83,4 +83,3 @@ rule gatk_applybqsr:
     wrapper:
         "0.66.0/bio/gatk/applybqsr"
 
-##local realignment around indels???
