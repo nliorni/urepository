@@ -14,7 +14,7 @@ rule all:
         expand("meqc/{sample}_meqc_stats.txt", sample=SAMPLES),
         expand("icov/{sample}_output_file.xlsx", sample=SAMPLES)
     message:
-        "Flowers"
+        "Flowers-Discord test"
 
 rule mapping:
     input:
