@@ -3,9 +3,7 @@
 
 Greetings,
 
-in this version wrappers will be used.
-
-It is assumed that you have your genome.fa, .fa.ann, .fa.amb, .fa.bwt, .fa.fai, .fa.pac, .fa.sai, .dict. You might need bwa Index and Samtools faidx. Specify the path in the config.json file. Also, you have to create a "data" directory inside the main directory in which you are working, create a "samples" directory inside, put your samples there and rename them like: a_R1.fastq/a_R2.fastq ... z_R1.fastq/z_R2.fastq. In the Snakefile (this is going to change very soon), search at the top for the list "SAMPLES", and add as many letters as many samples you have. 
+It is assumed that you have your genome.fa, .fa.ann, .fa.amb, .fa.bwt, .fa.fai, .fa.pac, .fa.sai, .dict. You might need bwa Index and Samtools faidx. Specify the paths in the config file. Also, you have to create a "samples" directory inside the main directory in which you are working, put there your samples and rename them like: a_1.fastq/a_1.fastq ... z_1.fastq/z_2.fastq. In the Snakefile (this is going to change very soon moving to config file), search at the top for the list "SAMPLES", and add as many letters as many samples you have. 
 
 If you have Conda installed on your system, you are pretty ready.
 
@@ -18,43 +16,31 @@ Activate the environment by typing
 			conda activate Snakemake-yourjob
 	   
 With wrappers, all the others packages needed will be provided and installed in your conda environment. 
-Here is provided a run.py python script, which handles the run of the Snakefile for you. So, type:
+Here you get a run.py python script, which handles the run of the Snakefile for you. So, type:
 
 	   		./run.py  -h  (for help)
 
-You are able to limit the workflow to your necessities. Choose the workflow and specify it via command line in the following way:
+You are able to limit the workflow to your necessities. Choose the workflow between the listed options and specify it via command line in the following way:
 
 			./run.py -w chosen_workflow -c config.json(.yaml) -other_arguments -q X 
 
-In this "alpha" phase, we have 4 standar options for "chosen_workflow" : Mapping, Calling, Annotating and Complete.  
+In this "beta" phase, we have 2 standard options for "chosen_workflow" : Single (one sample) or Combined (multiple samples).  
 
-For the DAG of jobs, type:
+To print the DAG of jobs, type:
 
 			./run.py -d | dot -Tsvg > dag.svg
 
 the expected output should be:
 	
-	-a "qc" directory with the .zip and .html report of fastqc
-	-a "meqc" directory with the results of the MEQC.R script
-	-a "mapped_reads" directory which contains the .bam file (fastq reference genome mapping)
-	-a "reheaded_reads" with the reheaded .bam file (reheading)
-	-a "dedup" directory which contains the .bam files without duplicates, and a metrics.txt file (remove (pcr) duplicates)
-	-a "recal" folder, which contains the base recalibrated .bam file (recalibration)
-	-a "sorted_reads" directory which contains the .sorted.bam and .sorted.bam.bai files (sorting)
-	-a "calls" directory with .g.vcf file (variant calling)
-	-an "annotated" directory which contains annotated .vcf, .html and .csv (annotation)
-	-a "combined" directory which contains the combined gvcf from different samples gvcfs
-	-a "genotyped" directory which contains the genotyped vcf from the combined gvcf
-	-a "log" directory wich contains all the error messages you might encounter
-	-a "stats" directory with some stats to be processed by scripts (work in progress)
-
-UPDATES:
-	
-	-workflow is now dynamic without the need of a workflow.json file
-	-iCoverage works
+	-a "mapped_reads" directory with the bam file/s
+	-a "genotyped" directory with the vcf file
+	-a "sift_dbNSFP" directory with the final fully annotated file
+	-a "log" directory wich contains all the error messages you might encounter during the workflow
+	-a "stats" directory with some stats to be processed by scripts
 	
 future improvements:
 	
-	-use costumized SNPeff databases
-	-upgrade gatk call with deepvariant (the wrapper is currently not working)
-	-add a BED file to limit the calling in gatk HaplotypeCaller
+	-update to DeepVariant/GlNexus
+	-add new workflow options!! (cnv, somatic and mitochondrial variant calling and annotation)
+	-add the SnpSift ExtractFields step based on the self made python script "extractfields.py"
+	-add an html report 
