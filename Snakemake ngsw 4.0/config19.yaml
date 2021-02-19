@@ -1,0 +1,7 @@
+reference: "../workflow_data/genomes/hg19_ucsc_filtered/hg19_ucsc_filtered.fa"
+bed: "../workflow_data/bed/slc2a1/slc2a1_and_antisense_hg19.bed"
+filtered: "../workflow_data/genomes/hg38_ucsc_filtered/hg38_ucsc_filtered_genomeFile.txt" #cerca hg19_ucsc_filtered_genomeFile.txt
+dict: "../workflow_data/genomes/hg19_ucsc_filtered/hg19_ucsc_filtered.dict"
+snpeff: "../workflow_data/db/snpeff/hg19" 
+dbnsfp: "../workflow_data/db/dbNSFP/dbNSFP2.9.3/dbNSFP2.9.3_variant.chr1.gz"
+dbsnp: "../workflow_data/db/dbSNP/hg19/snps/1000G_phase1.snps.high_confidence.hg19_sorted.vcf"
