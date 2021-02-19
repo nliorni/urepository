@@ -1,57 +1,44 @@
-SAMPLES = ["a", "b"] #add as many letters as the number of samples you have 
-#-> RENAME YOUR SAMPLES x_1.fastq e x_2.fastq and put them in data/samples
-
+SAMPLES = ["a"] #add as many letters as the number of samples you have 
 
 ## Target rules ##
 
 rule all:
     input:
-        expand("recal/{sample}.bam", sample=SAMPLES),
         expand("qc/fastqc/{sample}.html", sample=SAMPLES),
-        expand("mapped_reads/{sample}.bam", sample=SAMPLES),
-        "genotyped/all.vcf",
-        "sift_vartyped/all_annotated.csv",
-        expand("meqc/{sample}_meqc_stats.txt", sample=SAMPLES),
-        expand("icov/{sample}_output_file.xlsx", sample=SAMPLES)
-    message:
-        "Flowers-Discord test"
+        expand("stats/{sample}_meqc_stats.txt", sample=SAMPLES),
+        expand("stats/{sample}_iCoverage_output_file.xlsx", sample=SAMPLES),
+        expand("s_sift_dbNSFP/{sample}.vcf", sample=SAMPLES),
+        "sift_dbNSFP/all.vcf"
 
-rule mapping:
+rule single:
     input:
         expand("qc/fastqc/{sample}.html", sample=SAMPLES),
-        expand("mapped_reads/{sample}.bam", sample=SAMPLES)
-    message:
-        "So many of the same"
+        expand("stats/{sample}_meqc_stats.txt", sample=SAMPLES),
+        expand("stats/{sample}_iCoverage_output_file.xlsx", sample=SAMPLES),
+        expand("s_sift_dbNSFP/{sample}.vcf", sample=SAMPLES)
 
-rule calling:
+rule combined:
     input:
         expand("qc/fastqc/{sample}.html", sample=SAMPLES),
-        "genotyped/all.vcf"
-    message:
-        "So many unneeded"
+        expand("stats/{sample}_meqc_stats.txt", sample=SAMPLES),
+        expand("stats/{sample}_iCoverage_output_file.xlsx", sample=SAMPLES),
+        "sift_dbNSFP/all.vcf"
 
-rule annotating:
-    input:
-        expand("qc/fastqc/{sample}.html", sample=SAMPLES),
-        "sift_vartyped/all_annotated.csv"
-    message:
-        "God's in his heaven"
+#rule cnv:
+#   input:
 
-rule complete:
-    input:
-        expand("qc/fastqc/{sample}.html", sample=SAMPLES),
-        "sift_vartyped/all_annotated.csv",
-        expand("meqc/{sample}_meqc_stats.txt", sample=SAMPLES),
-        expand("icov/{sample}_output_file.xlsx", sample=SAMPLES)
-    message:
-        "All's right with the world"
+#rule somatic:
+#   input:
+
+#rule mitochondrial:
+#   input:
 
 ## Modules ##
 
 include: "rules/mapping.smk"
-include: "rules/fastqc.smk"
+include: "rules/qc.smk"
 include: "rules/adjusting.smk"
 include: "rules/sortindex.smk"
-include: "rules/calling.smk"
-include: "rules/annotating.smk"
 include: "rules/scripts.smk"
+include: "rules/combo_call_ann.smk"
+include: "rules/single_call_ann.smk"
