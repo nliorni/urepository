@@ -99,3 +99,15 @@ rule s_snpsift_dbNSFP:
        "logs/dbNSFP/{sample}.log"
    wrapper:
        "0.67.0/bio/snpsift/dbnsfp"
+
+#EXTRACT FIELDS
+
+rule s_snpsift_ExtractFields:
+    input:
+        "s_sift_dbNSFP/{sample}.vcf"
+    output:
+        "csvfile/{sample}.csv"
+    message:
+        "Extracting fields of interest from the completly annotated vcf file {input} into {output}"
+    shell:
+        "python3 scripts/extractfields.py --input {input} > {output}"
