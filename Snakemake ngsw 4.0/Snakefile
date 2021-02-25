@@ -1,4 +1,4 @@
-SAMPLES = ["a"] #add as many letters as the number of samples you have 
+SAMPLES = ["a", "b"] #add as many letters as the number of samples you have 
 
 ## Target rules ##
 
@@ -7,22 +7,22 @@ rule all:
         expand("qc/fastqc/{sample}.html", sample=SAMPLES),
         expand("stats/{sample}_meqc_stats.txt", sample=SAMPLES),
         expand("stats/{sample}_iCoverage_output_file.xlsx", sample=SAMPLES),
-        expand("s_sift_dbNSFP/{sample}.vcf", sample=SAMPLES),
-        "sift_dbNSFP/all.vcf"
+        expand("csvfile/{sample}.csv", sample=SAMPLES),
+        "csvfile/all.csv"
 
 rule single:
     input:
         expand("qc/fastqc/{sample}.html", sample=SAMPLES),
         expand("stats/{sample}_meqc_stats.txt", sample=SAMPLES),
         expand("stats/{sample}_iCoverage_output_file.xlsx", sample=SAMPLES),
-        expand("s_sift_dbNSFP/{sample}.vcf", sample=SAMPLES)
+        expand("csvfile/{sample}.csv", sample=SAMPLES)
 
 rule combined:
     input:
         expand("qc/fastqc/{sample}.html", sample=SAMPLES),
         expand("stats/{sample}_meqc_stats.txt", sample=SAMPLES),
         expand("stats/{sample}_iCoverage_output_file.xlsx", sample=SAMPLES),
-        "sift_dbNSFP/all.vcf"
+        "csvfile/all.csv"
 
 #rule cnv:
 #   input:
@@ -31,6 +31,12 @@ rule combined:
 #   input:
 
 #rule mitochondrial:
+#   input:
+
+#include rnaseq:
+#   input:
+
+#include singlecell:
 #   input:
 
 ## Modules ##
@@ -42,3 +48,4 @@ include: "rules/sortindex.smk"
 include: "rules/scripts.smk"
 include: "rules/combo_call_ann.smk"
 include: "rules/single_call_ann.smk"
+
