@@ -33,10 +33,13 @@ rule combined:
 #rule mitochondrial:
 #   input:
 
-#include rnaseq:
+#rule rnaseq:
 #   input:
 
-#include singlecell:
+#rule singlecell:
+#   input:
+
+#rule deepvariant:
 #   input:
 
 ## Modules ##
