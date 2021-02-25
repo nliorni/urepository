@@ -2,6 +2,8 @@
 
 import os.path
 import os
+import argparse
+
 
 #cerca il fieldsfile
 
@@ -12,6 +14,15 @@ if not os.path.exists(fieldsfile):
     sys.stderr.write('Error: cannot find the fieldsfile in the current folder')
     sys.exit(-1)
 
+    
+#introduco command line argument per l'input vcf file
+    
+parser = argparse.ArgumentParser(description='Specify the input file to extract fields', usage='python3 extractfields.py --input input.vcf > output.csv')
+parser.add_argument('-i', '--input', action='store', type=str,  help='-[required] specify the input file')
+args = parser.parse_args()
+
+inputfile=args.input
+
 #inizializza vettore dei campi
 
 fields_list=[]
@@ -20,23 +31,18 @@ fields_list=[]
 
 with open(fieldsfile, "r") as f:
     for line in f:
-       print(line) 
        fields_list.append(line.rstrip())
 
-print(fields_list)
 
 #inizializza il comando da eseguire
 
-shellcommand='/home/rasrafmekerk/anaconda3/envs/Snakemake/bin/SnpSift extractFields -s "," -e "." -info all.vcf '
-shellcommand2="ls -l" #comando di prova
+shellcommand='/home/rasrafmekerk/anaconda3/envs/Snakemake/bin/SnpSift extractFields -s "," -e "." -info '+inputfile+' '
 
 #completa il comando con i campi di interesse
 
 for i in range(len(fields_list)):
     shellcommand=shellcommand+fields_list[i]+" "
 
-print(shellcommand) #vediamo se la stringa è corretta
-
 #esegue il comando
 
-os.system(shellcommand) #esegui comando di prova
+os.system(shellcommand)
