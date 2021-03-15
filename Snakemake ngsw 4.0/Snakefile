@@ -1,28 +1,21 @@
-SAMPLES = ["a", "b"] #add as many letters as the number of samples you have 
-
 ## Target rules ##
-
-rule all:
-    input:
-        expand("qc/fastqc/{sample}.html", sample=SAMPLES),
-        expand("stats/{sample}_meqc_stats.txt", sample=SAMPLES),
-        expand("stats/{sample}_iCoverage_output_file.xlsx", sample=SAMPLES),
-        expand("csvfile/{sample}.csv", sample=SAMPLES),
-        "csvfile/all.csv"
 
 rule single:
     input:
-        expand("qc/fastqc/{sample}.html", sample=SAMPLES),
-        expand("stats/{sample}_meqc_stats.txt", sample=SAMPLES),
-        expand("stats/{sample}_iCoverage_output_file.xlsx", sample=SAMPLES),
-        expand("csvfile/{sample}.csv", sample=SAMPLES)
+        expand("qc/fastqc/{sample}_{num}.html", sample=config["samples"],  num=['1', '2']),
+        expand("stats/{sample}_meqc_stats.txt", sample=config["samples"]),
+        expand("stats/{sample}_iCoverage_output_file.xlsx", sample=config["samples"]),
+        expand("csvfile/{sample}.csv", sample=config["samples"])
 
 rule combined:
     input:
-        expand("qc/fastqc/{sample}.html", sample=SAMPLES),
-        expand("stats/{sample}_meqc_stats.txt", sample=SAMPLES),
-        expand("stats/{sample}_iCoverage_output_file.xlsx", sample=SAMPLES),
+        expand("qc/fastqc/{sample}_{num}.html", sample=config["samples"],  num=['1', '2']),
+        expand("stats/{sample}_meqc_stats.txt", sample=config["samples"]),
+        expand("stats/{sample}_iCoverage_output_file.xlsx", sample=config["samples"]),
         "csvfile/all.csv"
+
+#rule deepvariant:
+#   input:
 
 #rule cnv:
 #   input:
@@ -39,8 +32,6 @@ rule combined:
 #rule singlecell:
 #   input:
 
-#rule deepvariant:
-#   input:
 
 ## Modules ##
 
@@ -51,4 +42,5 @@ include: "rules/sortindex.smk"
 include: "rules/scripts.smk"
 include: "rules/combo_call_ann.smk"
 include: "rules/single_call_ann.smk"
+
 
