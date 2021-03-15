@@ -24,7 +24,7 @@ rule gatk_HaplotypeCaller:
 #COMBINE GVCFs
 rule gatk_CombineGvcfs:
     input:
-        gvcfs=expand("calls/{sample}.g.vcf", sample=SAMPLES),
+        gvcfs=expand("calls/{sample}.g.vcf", sample=config["samples"]),
         ref=config["reference"]
     output:
         gvcf=temp("combined/all.g.vcf")
@@ -130,3 +130,17 @@ rule snpsift_ExtractFields:
         "Extracting fields of interest from the completly annotated vcf file {input} into {output}"
     shell:
         "python3 scripts/extractfields.py --input {input} > {output}"
+
+
+#GENE LISTS CHECK
+
+# rule genelists_check:
+#     input:
+#         csv="csvfile/all.csv",
+#         genelists=config["genelists"]
+#     output:
+#         "genelistedcsv/all.csv"
+#     message:
+#         "Checking if the genes in the specified lists are present in the performed annotation"
+#     shell:
+#         "python3 genelists.py --input {input.csv} --genelists {input.genelists} > {output}"
