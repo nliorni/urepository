@@ -9,7 +9,7 @@ rule s_gatk_HaplotypeCaller:
         regions=config["bed"]
         #known="dbsnp.vcf"  # optional
     output:
-        gvcf=temp("s_calls/{sample}.g.vcf")
+        gvcf=temp("s_calls/{sample}.vcf")
     log:
         "logs/gatk/haplotypecaller/{sample}.log"
     message:
@@ -18,31 +18,31 @@ rule s_gatk_HaplotypeCaller:
         #extra=dd  # optional
         java_opts="-Xmx8G" #-L {input.bed}"
     shell:
-        "gatk HaplotypeCaller -I {input.bam}  -R {input.ref} -L {input.regions} -ERC GVCF -O {output.gvcf}"
+        "gatk HaplotypeCaller -I {input.bam}  -R {input.ref} -L {input.regions} -O {output.gvcf}"
         #"0.66.0/bio/gatk/haplotypecaller"
 
-#GENOTYPE GVCFs
-rule s_gatk_GenotypeGvcf:
-    input:
-        gvcf="s_calls/{sample}.g.vcf",
-        ref=config["reference"]
-    output:
-        vcf="s_genotyped/{sample}.vcf"
-    log:
-        "logs/gatk/genotype_gvcfs/{sample}.log"
-    message:
-        "Genotyping the g.vcf '{input.gvcf}', with reference '{input.ref}', into '{output.vcf}' with Gatk GenotypeGVcfs "
-    params:
-        extra="",  # optional
-        java_opts="", # optional
-    threads: 4
-    wrapper:
-        "0.67.0/bio/gatk/genotypegvcfs"
+# #GENOTYPE GVCFs
+# rule s_gatk_GenotypeGvcf:
+#     input:
+#         gvcf="s_calls/{sample}.g.vcf",
+#         ref=config["reference"]
+#     output:
+#         vcf="s_genotyped/{sample}.vcf"
+#     log:
+#         "logs/gatk/genotype_gvcfs/{sample}.log"
+#     message:
+#         "Genotyping the g.vcf '{input.gvcf}', with reference '{input.ref}', into '{output.vcf}' with Gatk GenotypeGVcfs "
+#     params:
+#         extra="",  # optional
+#         java_opts="", # optional
+#     threads: 4
+#     wrapper:
+#         "0.67.0/bio/gatk/genotypegvcfs"
 
 #ANNOTATE VCF WITH SNPEFF
 rule s_snpeff_Annotate:
     input:
-        calls="s_genotyped/{sample}.vcf", # (vcf, bcf, or vcf.gz)
+        calls="s_calls/{sample}.vcf", # (vcf, bcf, or vcf.gz)
         db=config["snpeff"] # path to reference db downloaded with the snpeff download wrapper
     output:
         #multiext("snpeff/{sample}", ".vcf", ".html", ".csv")
