@@ -1,7 +1,7 @@
 #MAPPING WITH BWA
 rule bwa_Mem:
     input:
-        reads=["samples/{sample}_1.fastq", "samples/{sample}_2.fastq"]
+        reads=lambda wildcards: expand(f"{config['samples'][wildcards.sample]}_{{num}}.fastq", num=[1,2])
     output:
         "mapped_reads/{sample}.bam"
     params:
