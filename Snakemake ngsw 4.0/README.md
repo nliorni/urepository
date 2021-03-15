@@ -34,7 +34,7 @@ the expected output should be:
 	
 	-a "mapped_reads" directory with the bam file/s
 	-a "genotyped" directory with the vcf file
-	-a "sift_dbNSFP" directory with the final fully annotated file
+	-a "csvfile" directory with the final fully annotated csv file
 	-a "log" directory wich contains all the error messages you might encounter during the workflow
 	-a "stats" directory with some stats to be processed by scripts
 	
