@@ -39,7 +39,7 @@ the expected output should be:
 	-a "stats" directory with some stats to be processed by scripts
 	
 future improvements:
-	
-	-update to DeepVariant/GlNexus
+
 	-add new workflow options!! (cnv, somatic and mitochondrial variant calling and annotation)
 	-add an html report 
+	-upgrade to Snakemake 6.0
