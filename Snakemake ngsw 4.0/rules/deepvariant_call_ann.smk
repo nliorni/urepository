@@ -1,5 +1,5 @@
-# #DEEPVARIANT
-rule Deepvariant:
+#DEEPVARIANT
+rule deepvariant_calling:
    input:
        bam="sorted_reads/{sample}.sorted.bam",
        bai="sorted_reads/{sample}.sorted.bam.bai",
@@ -10,7 +10,7 @@ rule Deepvariant:
        vcf="deepcalls/{sample}.g.vcf"    #try with g.vcf
    params:
        model="wgs",   # {wgs, wes}
-       extra="--regions chr1:43389920-43450402"
+       extra="--regions chr1:43389920-43450402" #prova --regions {regions}, regions=config["regions"]
    log:
        "logs/deepvariant/{sample}/stdout.log"
    message:
@@ -19,22 +19,7 @@ rule Deepvariant:
        "0.68.0/bio/deepvariant"
 
 
-#PENSA A BCFTOOLS CONCAT AL POSTO DI GLNEXUS!!!!! FORSE FUNZIONA!   https://github.com/dnanexus-rnd/DeepVariant-GLnexus-WDL
-
-
-
-#al posto di picard rename samples è possibile e consigliato usare bcftools reheader
-#OPPURE you can also use the --sample_name flag when running DeepVariant to manually specify the sample name
-
-# Note: The BAM files should provide unique names for each sample in their `SM`
-# header tag, which is usually derived from a command-line flag to the read
-# aligner. If your BAM files don't have unique `SM` tags (and if it's not feasible
-# to adjust the alignment pipeline), add the `--sample_name=XYZ` flag to
-# `run_deepvariant` to override the sample name written into the gVCF file header.
-
-
-
-#PICARD RENAME SAMPLES   #bisogna trovare un modo per chiamare differentmente i due campioni
+#PICARD RENAME SAMPLES   
 rule picard_RenameSampleInVcf:
     input:
         sample="deepcalls/{sample}.g.vcf"
@@ -43,37 +28,100 @@ rule picard_RenameSampleInVcf:
     message:
         "Renaming the vcf file {input.sample} to make it compatible with glnexus"
     shell:
-        "picard RenameSampleInVcf INPUT={input.sample} NEW_SAMPLE_NAME={wildcard.sample} OUTPUT={output}"
-
-
-#OPPURE
-
-# rule bcftools_reheader:
-#     input:
-#         vcf="a.bcf",
-#         ## new header, can be omitted if "samples" is set
-#         header="header.txt",
-#         ## file containing new sample names, can be omitted if "header" is set
-#         samples="samples.tsv"
-#     output:
-#         "a.reheader.bcf"
-#     params:
-#         extra="",  # optional parameters for bcftools reheader
-#         view_extra="-O b"  # add output format for internal bcftools view call
-#     wrapper:
-#         "0.72.0/bio/bcftools/reheader"
-
+        "picard RenameSampleInVcf INPUT={input.sample} NEW_SAMPLE_NAME={wildcards.sample} OUTPUT={output}"
 
 #GLNEXUS
-# rule combine_GlNexus:
-#     input:
-#         vcf=expand("deepnamed/{sample}_renamed.vcf", sample=config["samples"]),
-#         ref=config["reference"]
-#     output:
-#         "deepcombined/all.vcf"
-#     log:
-#         "logs/glnexus/allg.log"
-#     message:
-#         "Combining gvcfs {input.vcf} into {output} obtained from a DeepVariant calling"
-#     shell:
-#         "scripts/GLnexus/glnexus_cli {input.vcf} > {output}"
+rule combine_GLNexus:
+    input:
+        gvcfs=expand("deepnamed/{sample}_renamed.g.vcf", sample=config["samples"])
+    output:
+        "gl_combined/all.bcf"
+    message: 
+        "Combining the gvcf files {input.gvcfs} obtained from DeepVariant calling into {output} using GLNexus"
+    shell:
+        "scripts/glnexus_cli --config DeepVariant {input.gvcfs} > {output}"
+
+#BCFTOOLS CONVERTING 
+rule bcftools_View:
+    input:
+        "gl_combined/all.bcf"
+    output:
+        "gl_combined/all.vcf"
+    message:
+        "Converting {input} into {output} using bcftools View"
+    shell:
+        "bcftools view {input} > {output} "
+
+#ANNOTATE VCF WITH SNPEFF
+rule dv_snpeff_Annotate:
+    input:
+        calls="gl_combined/all.vcf", # (vcf, bcf, or vcf.gz)
+        db=config["snpeff"] # path to reference db downloaded with the snpeff download wrapper
+    output:
+        #multiext("snpeff/{sample}", ".vcf", ".html", ".csv")
+        calls="dv_annotated/all.vcf",   # annotated calls (vcf, bcf, or vcf.gz)
+        stats="dv_annotated/all.html",  # summary statistics (in HTML), optional
+        csvstats="dv_annotated/all.csv" # summary statistics in CSV, optional
+    log:
+        "logs/snpeff/all.log"
+    message:
+        "Annotating '{input.calls}' with '{input.db}' to generate '{output.calls}', '{output.stats}' and '{output.csvstats}' with SnpEff Annotate"
+    params:
+        extra="-Xmx8g"           # optional parameters (e.g., max memory 4g)
+    wrapper:
+        "0.66.0/bio/snpeff/annotate"
+
+#SNPSIFT ANNOTATE
+rule dv_snpsift_Annotate:
+    input:
+        call="dv_annotated/all.vcf",
+        database=config["dbsnp"]
+    output:
+        call=temp("dv_sift_annotated/all.vcf")
+    message:
+        "Further annotating '{input.call}' using '{input.database}' creating '{output.call}' with SnpSift Annotate"
+    log:
+        "logs/snpsift/annotate/all.log"
+    wrapper:
+        "0.67.0/bio/snpsift/annotate"
+
+
+#SNPSIFT VARTYPE
+rule dv_snpsift_VarType:
+    input:
+        vcf="dv_sift_annotated/all.vcf"
+    output:
+        vcf=temp("dv_sift_vartyped/all.vcf")
+    message:
+        "Further annotating '{input.vcf}' creating '{output.vcf}' with SnpSift VarType"
+    log:
+        "logs/snpsift/vartype/all.log"
+    wrapper:
+        "0.67.0/bio/snpsift/varType"
+
+#dbNSFP
+rule dv_snpsift_dbNSFP:
+   input:
+       call = "dv_sift_vartyped/all.vcf",
+       dbNSFP = config["dbnsfp"]
+   output:
+       call = "dv_sift_dbNSFP/all.vcf"
+   message:
+       "Further annotating '{input.call}' using '{input.dbNSFP}', creating '{output.call}' with SnpSift dbNSFP"
+   log:
+       "logs/dbNSFP/all.log"
+   wrapper:
+       "0.67.0/bio/snpsift/dbnsfp"
+
+#EXTRACT FIELDS
+
+rule dv_snpsift_ExtractFields:
+    input:
+        "dv_sift_dbNSFP/all.vcf"
+    output:
+        "dv_csvfile/all.csv"
+    message:
+        "Extracting fields of interest from the completly annotated vcf file {input} into {output}"
+    shell:
+        "python3 scripts/extractfields.py --input {input} > {output}"
+
