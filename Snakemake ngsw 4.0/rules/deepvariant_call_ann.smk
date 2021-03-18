@@ -114,7 +114,6 @@ rule dv_snpsift_dbNSFP:
        "0.67.0/bio/snpsift/dbnsfp"
 
 #EXTRACT FIELDS
-
 rule dv_snpsift_ExtractFields:
     input:
         "dv_sift_dbNSFP/all.vcf"
