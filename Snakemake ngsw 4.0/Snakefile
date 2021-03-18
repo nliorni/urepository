@@ -1,4 +1,4 @@
-## Target rules ##
+## Target rules ##  ## Workflow options: single, combined, deepvariant ##
 
 rule single:
     input:
@@ -14,8 +14,12 @@ rule combined:
         expand("stats/{sample}_iCoverage_output_file.xlsx", sample=config["samples"]),
         "csvfile/all.csv"
 
-#rule deepvariant:
-#   input:
+rule deepvariant:
+  input:
+        expand("qc/fastqc/{sample}_{num}.html", sample=config["samples"],  num=['1', '2']),
+        expand("stats/{sample}_meqc_stats.txt", sample=config["samples"]),
+        expand("stats/{sample}_iCoverage_output_file.xlsx", sample=config["samples"]),
+        "dv_csvfile/all.csv"
 
 #rule cnv:
 #   input:
@@ -42,5 +46,5 @@ include: "rules/sortindex.smk"
 include: "rules/scripts.smk"
 include: "rules/combo_call_ann.smk"
 include: "rules/single_call_ann.smk"
-
+include: "rules/deepvariant_call_ann.smk"
 
