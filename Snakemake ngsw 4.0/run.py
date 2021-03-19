@@ -46,7 +46,7 @@ if __name__ == '__main__':
     parser.add_argument('-d', '--dag', action='store_true', help='-print the DAG of jobs in dot graphviz language. Remember to specify "|dot -Tsvg > dag.svg"')
     parser.add_argument('-q', '--cores', action='store', type=int,  help='-[required] specify how many cores to use')
     parser.add_argument('-f', '--forceall', action='store_true', help='-force the execution of the workflow even if it is done already')
-    parser.add_argument('-w', '--workflow', action='store', help='-[required] choose the workflow between: "single","combined"')
+    parser.add_argument('-w', '--workflow', action='store', help='-[required] choose the workflow. Options: gatk, deepvariant, single_gatk, single_deepvariant')
     parser.add_argument('-c', '--configfile', action='store', help='-[required] choose the configuration file')
     args = parser.parse_args()
 
