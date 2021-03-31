@@ -33,3 +33,4 @@ future improvements:
 
 	-add new workflow options!! (cnv, somatic and mitochondrial variant calling and annotation)
 	-add an html report 
+	-migrate workflow options to config file and wrap the Snakefile
