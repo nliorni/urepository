@@ -34,4 +34,4 @@ future improvements:
 	-add new workflow options!! (cnv, somatic and mitochondrial variant calling and annotation)
 	-add an html report 
 	-migrate workflow options to config file and wrap the Snakefile
-	-fix deepvariant option to a version that can be fed with a bed file
+	-fix deepvariant workflow option to a version that can be fed with a bed file
