@@ -1,0 +1,86 @@
+## Optional outputs ##
+fastqc_output=[]
+if config["fastqc"]==True:
+    fastqc_output.append("results/qc/fastqc/{sample}_{num}.html")
+
+meqc_output=[]
+if config["meqc"]==True:
+    meqc_output.append("results/stats/{sample}_meqc_stats.txt")
+
+icov_output=[]
+if config["icov"]==True:
+    icov_output.append("results/stats/{sample}_iCoverage_output_file.xlsx")
+
+# def get_input(wildcards):
+#     input_list = []
+#     if config["fastqc"]==True:
+#         input_list.append("""expand("results/qc/fastqc/{sample}_{num}.html", sample=config["samples"],  num=['1', '2'])""")
+#     return input_list
+
+## Target rules ##  ## Workflow options ##
+rule gatk:
+    input:
+        expand(fastqc_output, sample=config["samples"], num=['1', '2']),
+        expand(meqc_output, sample=config["samples"]),
+        expand(icov_output, sample=config["samples"]),
+        "results/csvfile/all.csv"
+    message:
+        "Your gatk workflow annotating variant in multiple combined samples is complete"
+
+rule deepvariant:
+    input:
+        expand(fastqc_output, sample=config["samples"], num=['1', '2']),
+        expand(meqc_output, sample=config["samples"]),
+        expand(icov_output, sample=config["samples"]),
+        "results/dv_csvfile/all.csv"
+    message:
+        "Your deepvariant workflow annotating variant in multiple combined samples is complete"
+
+rule single_gatk:
+    input:
+        expand(fastqc_output, sample=config["samples"], num=['1', '2']),
+        expand(meqc_output, sample=config["samples"]),
+        expand(icov_output, sample=config["samples"]),
+        expand("results/csvfile/{sample}.csv", sample=config["samples"])
+    message:
+        "Your gatk workflow annotating variant on samples independently is complete"
+        
+rule single_deepvariant:
+    input:
+        expand(fastqc_output, sample=config["samples"], num=['1', '2']),
+        expand(meqc_output, sample=config["samples"]),
+        expand(icov_output, sample=config["samples"]),
+        expand("results/dv_csvfile/{sample}.csv", sample=config["samples"])
+    message:
+        "Your deepvariant workflow annotating variant on samples independently is complete"
+
+#rule cnv:
+#   input:
+
+#rule somatic:
+#   input:
+
+#rule mitochondrial:
+#   input:
+
+#rule rnaseq:
+#   input:
+
+#rule singlecell:
+#   input:
+
+
+## Modules ##
+include: "rules/mapping.smk"
+include: "rules/qc.smk"
+include: "rules/adjusting.smk"
+include: "rules/sortindex.smk"
+include: "rules/scripts.smk"
+include: "rules/gatk_call_ann.smk"
+include: "rules/deepvariant_call_ann.smk"
+include: "rules/single_gatk_call_ann.smk"
+include: "rules/single_deepvariant_call_ann.smk"
+
+
+
+
