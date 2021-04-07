@@ -12,12 +12,12 @@ Activate the environment by typing
 
 			conda activate Snakemake-yourjob
 	   
-With wrappers, all the others packages needed will be provided and installed in your conda environment. 
-Here you get a run.py python script, which handles the run of the Snakefile for you. So, type:
+With wrappers, all the others packages needed will be provided and installed in your system. 
+Here you get a run.py python script, which handles the run of the Snakefile. Type:
 
 	   		./run.py  -h  (for help)
 
-You are able to limit the workflow to your necessities. Choose the workflow between the listed options and specify it via command line in the following way:
+Choose the workflow between the listed options and specify it via command line in the following way:
 
 			./run.py -w chosen_workflow -c config.json(.yaml) -other_arguments -q X 
 
