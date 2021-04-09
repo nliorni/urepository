@@ -19,9 +19,7 @@ Here you get a run.py python script, which handles the run of the Snakefile. Typ
 
 Choose the workflow between the listed options and specify it via command line in the following way:
 
-			./run.py -w chosen_workflow -c config.json(.yaml) -other_arguments -q X 
-
-In this "beta" phase, we have 2 standard options for "chosen_workflow" : Single (one sample) or Combined (multiple samples).  
+			./run.py -w chosen_workflow -c config.json(.yaml) -other_arguments -q X   
 
 To print the DAG of jobs, type:
 
