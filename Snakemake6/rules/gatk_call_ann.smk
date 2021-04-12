@@ -19,7 +19,7 @@ rule gatk_HaplotypeCaller:
         extra=config["gatk_HaplotypeCaller"]["params"]["extra"]
     shell:
         "gatk HaplotypeCaller --java-options {params.java_opts} -I {input.bam}  -R {input.ref} -L {input.regions} -ERC GVCF {params.extra} -O {output.gvcf}"
-        #"0.66.0/bio/gatk/haplotypecaller"
+        #"0.66.0/bio/gatk/haplotypecaller" #spostare -ERC GVCF nel config file sotto extra
 
 ## Gatk CombineGvcfs ##
 rule gatk_CombineGvcfs:
@@ -75,6 +75,7 @@ rule snpeff_Annotate:
     message:
         "Running SnpEff Annotate. Annotating '{input.calls}' with '{input.db}' to generate '{output.calls}', '{output.stats}' and '{output.csvstats}'."
     params:
+        java_opts=config["snpeff_Annotate"]["params"]["java_opts"],
         extra=config["snpeff_Annotate"]["params"]["extra"]          
     wrapper:
         "0.66.0/bio/snpeff/annotate"
@@ -88,6 +89,9 @@ rule snpsift_Annotate:
         call=temp("results/sift_annotated/all.vcf")
     message:
         "Running SnpSift Annotate. Further annotating '{input.call}' using '{input.database}' creating '{output.call}'."
+    params:
+        java_opts=config["snpsift_Annotate"]["params"]["java_opts"],
+        extra=config["snpsift_Annotate"]["params"]["extra"]
     log:
         "logs/snpsift/annotate/all.log"
     wrapper:
@@ -116,6 +120,9 @@ rule snpsift_dbNSFP:
        call = "results/sift_dbNSFP/all.vcf"
    message:
        "Running SnpSift dbNSFP. Further annotating '{input.call}' using '{input.dbNSFP}', creating '{output.call}'."
+   params:
+        extra=config["snpsift_dbNSFP"]["params"]["extra"],
+        java_opts=config["snpsift_dbNSFP"]["params"]["java_opts"]
    log:
        "logs/snpsift/dbNSFP/all.log"
    wrapper:
