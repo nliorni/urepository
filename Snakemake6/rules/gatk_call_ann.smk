@@ -19,7 +19,7 @@ rule gatk_HaplotypeCaller:
         extra=config["gatk_HaplotypeCaller"]["params"]["extra"]
     shell:
         "gatk HaplotypeCaller --java-options {params.java_opts} -I {input.bam}  -R {input.ref} -L {input.regions} -ERC GVCF {params.extra} -O {output.gvcf}"
-        #"0.66.0/bio/gatk/haplotypecaller" #spostare -ERC GVCF nel config file sotto extra
+        #"0.66.0/bio/gatk/haplotypecaller"
 
 ## Gatk CombineGvcfs ##
 rule gatk_CombineGvcfs:
@@ -66,19 +66,21 @@ rule snpeff_Annotate:
         calls="results/merged/all.vcf", # (vcf, bcf, or vcf.gz)
         db=config["snpeff"] # path to reference db downloaded with the snpeff download wrapper
     output:
-        #multiext("snpeff/{sample}", ".vcf", ".html", ".csv")
         calls="results/annotated/all.vcf",   # annotated calls (vcf, bcf, or vcf.gz)
         stats="results/annotated/all.html",  # summary statistics (in HTML), optional
         csvstats="results/annotated/all.csv" # summary statistics in CSV, optional
     log:
         "logs/snpeff/annotate/all.log"
+    # optional specification of memory usage of the JVM that snakemake will respect with global
+    # resource restrictions (https://snakemake.readthedocs.io/en/latest/snakefiles/rules.html#resources)
+    # and which can be used to request RAM during cluster job submission as `{resources.mem_mb}`:
+    # https://snakemake.readthedocs.io/en/latest/executing/cluster.html#job-properties
+    resources:
+        mem_mb=8192
     message:
         "Running SnpEff Annotate. Annotating '{input.calls}' with '{input.db}' to generate '{output.calls}', '{output.stats}' and '{output.csvstats}'."
-    params:
-        java_opts=config["snpeff_Annotate"]["params"]["java_opts"],
-        extra=config["snpeff_Annotate"]["params"]["extra"]          
     wrapper:
-        "0.66.0/bio/snpeff/annotate"
+        "0.73.0/bio/snpeff/annotate"
 
 ## SnpSift Annotate ##
 rule snpsift_Annotate:
@@ -89,9 +91,6 @@ rule snpsift_Annotate:
         call=temp("results/sift_annotated/all.vcf")
     message:
         "Running SnpSift Annotate. Further annotating '{input.call}' using '{input.database}' creating '{output.call}'."
-    params:
-        java_opts=config["snpsift_Annotate"]["params"]["java_opts"],
-        extra=config["snpsift_Annotate"]["params"]["extra"]
     log:
         "logs/snpsift/annotate/all.log"
     wrapper:
@@ -121,8 +120,7 @@ rule snpsift_dbNSFP:
    message:
        "Running SnpSift dbNSFP. Further annotating '{input.call}' using '{input.dbNSFP}', creating '{output.call}'."
    params:
-        extra=config["snpsift_dbNSFP"]["params"]["extra"],
-        java_opts=config["snpsift_dbNSFP"]["params"]["java_opts"]
+        extra=config["snpsift_dbNSFP"]["params"]["extra"]
    log:
        "logs/snpsift/dbNSFP/all.log"
    wrapper:
