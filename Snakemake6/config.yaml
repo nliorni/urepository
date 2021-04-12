@@ -8,7 +8,7 @@ icov: True
 
 ## Path of the samples
 samples:
-  MGM20-1647: samples/MGM20-1647
+  #MGM20-1647: samples/MGM20-1647
   MGM20-1869: samples/MGM20-1869
   #dicitura: nome: path/to/nome (nel path avrà formato nome_num.fastq)
 
@@ -39,6 +39,7 @@ genelists:
   -"lists/genelist1.txt"
   -"lists/genelist2.txt"
 
+
 ## Tools Parameters ##
 
 # The java_opts param allows for additional arguments to be passed to the java compiler,
@@ -47,7 +48,6 @@ genelists:
 # The extra param alllows for additional program arguments.
 
 # For more inforamtion see, https://software.broadinstitute.org/gatk/documentation/article?id=11050
-
 
 FastQC:
   params: ""
@@ -88,13 +88,13 @@ samtools_Index:
 
 gatk_HaplotypeCaller:
   params:
-    java_opts: "-Xmx8G" 
+    java_opts: "-Xmx8g" 
     extra: "--standard-min-confidence-threshold-for-calling 10.0 --sample-ploidy 2 --dont-use-soft-clipped-bases"
 
 gatk_CombineGvcfs:
   params:
     extra: "" 
-    java_opts: "" 
+    java_opts: "-Xmx8g" 
 
 gatk_GenotypeGvcfs:
   params:
@@ -115,11 +115,19 @@ gatk_FilterVariants:
 
 snpeff_Annotate:
   params:
-    extra: "-Xmx8g" 
+    extra: ""
+    java_opts: "-Xmx8g" 
+
+snpsift_Annotate:
+  params:
+    extra: ""
+    java_opts: "-Xmx8g"
+
+snpsift_dbNSFP:
+  params:
+    extra: "-n" # -n comprente tutti i fields tranne quelli specificati con -f
+    java_opts: "-Xmx8g"
 
 deepvariant:
   model: "wgs"     # {wgs, wes}
   regions: " --region chr1:43389920-43450402"
-  
-
-
