@@ -29,16 +29,15 @@ dict: "../workflow_data/genomes/hg19_ucsc_filtered/hg19_ucsc_filtered.dict"
 snpeff: "../workflow_data/db/snpeff/hg19" 
 
 ## Path to the dbNSFP database
-dbnsfp: "../workflow_data/db/dbNSFP/dbNSFP2.9.3/dbNSFP2.9.3_variant.chr1.gz"
+dbnsfp: "../workflow_data/db/dbNSFP/4.1/dbNSFP4.1a_hg19_variant.chr1.gz"
 
 ## Path to the dbNSP database
-dbsnp: "../workflow_data/db/dbSNP/hg19/1000G_phase1.snps.high_confidence.hg19_sorted.vcf"
+dbsnp: "../workflow_data/db/dbSNP/hg19/snps/1000G_phase1.snps.high_confidence.hg19_sorted.vcf"
 
 ## Paths of the gene lists you want to check
 genelists:
   -"lists/genelist1.txt"
   -"lists/genelist2.txt"
-
 
 ## Tools Parameters ##
 
@@ -48,6 +47,7 @@ genelists:
 # The extra param alllows for additional program arguments.
 
 # For more inforamtion see, https://software.broadinstitute.org/gatk/documentation/article?id=11050
+
 
 FastQC:
   params: ""
@@ -88,13 +88,13 @@ samtools_Index:
 
 gatk_HaplotypeCaller:
   params:
-    java_opts: "-Xmx8g" 
+    java_opts: "-Xmx8G" 
     extra: "--standard-min-confidence-threshold-for-calling 10.0 --sample-ploidy 2 --dont-use-soft-clipped-bases"
 
 gatk_CombineGvcfs:
   params:
     extra: "" 
-    java_opts: "-Xmx8g" 
+    java_opts: "" 
 
 gatk_GenotypeGvcfs:
   params:
@@ -113,20 +113,14 @@ gatk_FilterVariants:
   indels:
     filters: {"myfilter": "QD < 2.0 || FS > 200.0 || ReadPosRankSum < -20.0"}
 
-snpeff_Annotate:
-  params:
-    extra: ""
-    java_opts: "-Xmx8g" 
-
-snpsift_Annotate:
-  params:
-    extra: ""
-    java_opts: "-Xmx8g"
+# snpeff_Annotate:
+#   params:
+#     extra: ""
+#     java_opts: "" 
 
 snpsift_dbNSFP:
   params:
     extra: "-n" # -n comprente tutti i fields tranne quelli specificati con -f
-    java_opts: "-Xmx8g"
 
 deepvariant:
   model: "wgs"     # {wgs, wes}
