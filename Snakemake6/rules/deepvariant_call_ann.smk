@@ -66,9 +66,7 @@ rule dv_snpeff_Annotate:
     log:
         "logs/snpeff/all.log"
     message:
-        "Running SnpEff Annotate. Annotating '{input.calls}' with '{input.db}' to generate '{output.calls}', '{output.stats}' and '{output.csvstats}'."
-    params:
-        extra=config["snpeff_Annotate"]["params"]["extra"]   
+        "Running SnpEff Annotate. Annotating '{input.calls}' with '{input.db}' to generate '{output.calls}', '{output.stats}' and '{output.csvstats}'."   
     wrapper:
         "0.66.0/bio/snpeff/annotate"
 
