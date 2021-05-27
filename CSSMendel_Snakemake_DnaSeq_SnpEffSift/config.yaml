@@ -1,0 +1,140 @@
+## Optional Tools ##
+
+fastqc: True
+meqc: True
+icov: True 
+
+## Files Paths ##
+
+## Path of the samples
+samples:
+  #dicitura: nome: path/to/nome (nel path avrà formato "nome_unit.fastq.gz")
+  #pensare a includere L001 nelle units
+
+
+## Path of the reference genome
+reference: ""
+
+## Path of the bed file 
+bed: ""
+
+## Path of the filtered genome file 
+filtered: "" #cerca hg19_ucsc_filtered_genomeFile.txt
+
+## Path of the reference genome dictionary
+dict: ""
+
+## Path to the Snpeff database
+snpeff: ""  
+
+## Path to the dbNSFP database
+dbnsfp: ""
+
+## Path to the dbNSP database
+dbsnp: ""
+
+
+## Extra Softwares Paths ##
+
+java_path: "/home/n.liorni/Snakemake_loc_DnaSeq_Analysis_Pipeline/.snakemake/conda/783a7dbb/bin/java"
+snpsift_path: "/home/n.liorni/Snakemake_loc_DnaSeq_Analysis_Pipeline/.snakemake/conda/783a7dbb/share/snpsift-4.3.1t-3/SnpSift.jar"
+
+## Tools Parameters ##
+
+# The java_opts param allows for additional arguments to be passed to the java compiler,
+# e.g. “-Xmx4G” for one, and “-Xmx4G -XX:ParallelGCThreads=10” for two options.
+
+# The extra param alllows for additional program arguments.
+
+# For more information see, https://software.broadinstitute.org/gatk/documentation/article?id=11050
+
+FastQC:
+  params: ""
+
+bwaMem:
+  params:
+    sort: "samtools" # Can be 'none', 'samtools' or 'picard'.
+    sort_order: "coordinate"  # Can be 'queryname' or 'coordinate'.
+    sort_extra:  "" # Extra args for samtools/picard.
+
+picard_AddOrReplaceGroups:
+  params: "VALIDATION_STRINGENCY=LENIENT RGLB=lib1 RGPL=ILLUMINA RGPU=unit1 RGSM=20"
+
+# the bed file path must be hard coded
+samtools_View:
+  params: "-b -h -L ../workflow_data/bed/slc2a1_and_antisense_hg19.bed"
+
+picard_MarkDuplicates:
+  params: "ASSUME_SORTED=true REMOVE_DUPLICATES=false"
+
+gatk_BaseRecalibrator:
+  params:
+    extra: "" 
+    java_opts: "" 
+
+gatk_ApplyBQSR:
+  params:
+    extra: ""  
+    java_opts: ""  
+
+picard_Sortsam:
+  params:
+    sort_order: "coordinate"
+    extra: "VALIDATION_STRINGENCY=LENIENT"
+
+samtools_Index: 
+  params: "" 
+
+gatk_HaplotypeCaller:
+  params:
+    java_opts: "-Xmx16G" 
+    extra: "--standard-min-confidence-threshold-for-calling 10.0 --sample-ploidy 2 --dont-use-soft-clipped-bases"
+
+gatk_CombineGvcfs:
+  params:
+    extra: "" 
+    java_opts: "" 
+
+gatk_GenotypeGvcfs:
+  params:
+    extra: "--standard-min-confidence-threshold-for-calling 10.0 --sample-ploidy 2" # optional
+    java_opts: "-Xmx4g" 
+
+gatk_SelectVariants:
+  snps:
+    extra: "--select-type-to-include SNP --select-type-to-include MNP"
+  indel:
+    extra: "--select-type-to-include INDEL --select-type-to-include MIXED"
+
+gatk_FilterVariants:
+  snps:
+    filters: {"myfilter": "QD < 2.0 || FS > 60.0 || MQ < 40.0 || MQRankSum < -12.5 || ReadPosRankSum < -8.0"}
+  indels:
+    filters: {"myfilter": "QD < 2.0 || FS > 200.0 || ReadPosRankSum < -20.0"}
+
+#snpeff_Annotate:
+#   params:
+#     extra: ""
+#     java_opts: "" 
+
+snpsift_Annotate:
+  params:
+    java_opts: "-Xmx50G"
+    extra: ""
+
+snpsift_VarType:
+  params:
+    java_opts: "-Xmx50G"
+    extra: ""
+
+snpsift_dbNSFP:
+  params:
+    java_opts: "-Xmx50G"
+    extra: "-n " # -n annota tutti i fields tranne quelli specificati con -f, -g dovrebbe indicare la versione del genoma
+
+extractFields:
+  path: "/home/n.liorni/.conda/envs/Snakemake/bin/SnpSift"
+
+  
+
+
