@@ -36,8 +36,8 @@ dbsnp: ""
 
 ## Extra Softwares Paths ##
 
-java_path: "/home/n.liorni/Snakemake_loc_DnaSeq_Analysis_Pipeline/.snakemake/conda/783a7dbb/bin/java"
-snpsift_path: "/home/n.liorni/Snakemake_loc_DnaSeq_Analysis_Pipeline/.snakemake/conda/783a7dbb/share/snpsift-4.3.1t-3/SnpSift.jar"
+java_path: ""
+snpsift_path: ""
 
 ## Tools Parameters ##
 
