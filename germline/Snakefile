@@ -1,0 +1,85 @@
+## Define output directory ##
+
+outputDir = config["output_dir"]
+
+## Optional outputs ##
+
+multiqc_output=[]
+if config["multiqc"]==True and config["workflow"]=="standard":
+    multiqc_output.append(outputDir+"results/multiqc/multiqc_report.html")
+
+fastqc_output=[]
+if config["fastqc"]==True and config["workflow"]=="standard":
+    fastqc_output.append(outputDir+"results/{sample}/qc/{sample}_{unit}_fastqc.html")
+
+meqc_output=[]
+if config["meqc"]==True and config["workflow"]!="StartWithVcf":
+    meqc_output.append(outputDir+"results/{sample}/qc/{sample}_meqc_stats.txt")
+
+icov_output=[]
+if config["icov"]==True and config["workflow"]!="StartWithVcf":
+    icov_output.append(outputDir+"results/{sample}/qc/{sample}_iCoverage_output_file.xlsx")
+    
+
+## Target rules ##  ## Workflow options ##
+rule justqc:
+    input:
+        expand(fastqc_output, sample=config["samples"], unit=config["unit"]),
+        expand(multiqc_output)
+    message:
+        "JustQC"
+        
+rule bam:
+    input:
+        expand(fastqc_output, sample=config["samples"], unit=config["unit"]),
+        expand(multiqc_output),
+        expand(meqc_output, sample=config["samples"]),
+        expand(icov_output, sample=config["samples"]),
+        expand(outputDir+"results/{sample}/{sample}.bqsr.bam", sample=config["samples"]),
+        expand(outputDir+"results/{sample}/{sample}.bqsr.bam.bai", sample=config["samples"]),
+    message:
+        "BAM files are ready"
+
+rule vcf:
+    input:
+        expand(fastqc_output, sample=config["samples"], unit=config["unit"]),
+        expand(multiqc_output),
+        expand(meqc_output, sample=config["samples"]),
+        expand(icov_output, sample=config["samples"]),
+        expand(outputDir+"results/{sample}/{sample}.filter.vcf", sample=config["samples"])
+    message:
+        "VCF files are ready"
+
+rule vep:
+    input:
+        expand(fastqc_output, sample=config["samples"], unit=config["unit"]),
+        expand(multiqc_output),
+        expand(meqc_output, sample=config["samples"]),
+        expand(icov_output, sample=config["samples"]),
+        expand(outputDir+"results/{sample}/{sample}.xlsx", sample=config["samples"]),
+    message:
+        "VEP workflow finished"
+
+rule cohort:
+    input:
+        outputDir+"results/cohort/cohort.g.vcf",
+        outputDir+"results/cohort/cohort.xlsx"
+
+
+### next step
+# rule cohort:
+#     input:
+#         expand(outputDir+"results/{cohort}/{cohort}.g.vcf", cohort = config["cohort"]),
+#         expand(outputDir+"results/{cohort}/{cohort}.vep.final.xlsx", cohort = config["cohort"]),
+#         expand(outputDir+"results/{cohort}/{cohort}.xlsx", cohort = config["cohort"])
+
+     
+## Included Modules ##
+include: "workflow/rules/common.smk"
+include: "workflow/rules/qc.smk"
+include: "workflow/rules/map.smk"
+include: "workflow/rules/preprocess.smk"
+include: "workflow/rules/stats.smk"
+include: "workflow/rules/calling.smk"
+include: "workflow/rules/vep.smk"
+include: "workflow/rules/cohort.smk"

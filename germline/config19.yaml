@@ -1,0 +1,206 @@
+### Optional Tools ###
+
+fastqc: True
+multiqc: True
+meqc: True
+icov: True
+
+## Workflow definition ##
+
+workflow: "standard" # options: "standard", "StartWithBam", "StartWithVcf"
+
+## Output Directory ##
+
+output_dir : "/data3/pipeline_data/output/prova_finale/"
+
+## Specify unit format ##
+
+unit: ["R1", "R2"]
+
+## Specify extension format ##
+
+extension: "fastq.gz"
+
+### Files Paths ###
+
+# specify the path of the cohort samples' gvcfs
+cohort:
+  EM001PROB: /data3/pipeline_data/input/esomi/EM001PROB
+  # MGM03-0344_S5: /data2/analysis2/results_pipeline/germline/prova_evc/results/gvcfs/MGM03-0344_S5.g.vcf
+  # MGM03-0348_S4: /data2/analysis2/results_pipeline/germline/prova_evc/results/gvcfs/MGM03-0348_S4.g.vcf
+  # MGM11-0556_S2: /data2/analysis2/results_pipeline/germline/prova_evc/results/gvcfs/MGM11-0556_S2.g.vcf
+
+## Path of the samples
+samples:
+  EM001PROB: /data3/pipeline_data/input/esomi/EM001PROB
+  #MGM03-0348_S4: /data3/pipeline_data/input/evc/MGM03-0348_S4
+  #MGM11-0556_S2: /data3/pipeline_data/input/evc/MGM11-0556_S2
+  # How to specify samples ->  name: path/to/name (where the sample is "name_unit.fastq.gz")
+
+
+## Path of the fields files 
+
+vcf_fieldsfile: "/data3/pipeline_data/fieldsFiles/vcf_diag.txt"
+vep_fieldsfile: "/data3/pipeline_data/fieldsFiles/tom.txt"
+
+## Path of the gene lists
+
+genelists: ["/data3/pipeline_data/genesLists/try.txt", "/data3/pipeline_data/genesLists/try2.txt", "/data3/pipeline_data/genesLists/try3.txt"]
+
+## Path of the reference genome
+reference: "/data/reference_data/hg19/genome/hg19_ucsc_filtered.fa" 
+
+## Path of the bed file
+bed: "/software/dataseq/bed/KAPA_HyperExome_hg19_capture_targets_gene_symbols.bed"
+
+## Path of the filtered genome file 
+genomeFile: "/data/reference_data/hg19/genome/hg19_ucsc_filtered_genomeFile.txt" 
+
+## Path of the reference genome dictionary
+dict: "/data/reference_data/hg19/genome/hg19_ucsc_filtered.dict" 
+
+## Path to Snpeff database
+snpeff: "/software/dataseq/databases/snpeff/hg19"  
+
+## Path to dbNSFP database
+dbnsfp: "/software/dataseq/databases/dbNSFP/4.1a/hg19/dbNSFP4.1a_grch37.gz" 
+
+## Path to dbNSP database
+dbsnp: "/data/reference_data/hg19/dbSNP/dbSNP_151_hg19_chr.vcf" 
+
+## Path to ClinVar database 
+clinvar: "/software/dataseq/databases/ClinVar/hg19/clinvar.vcf.gz"  
+
+## Path to gnomAD database
+gnomad: "/software/dataseq/databases/gnomAD/hg19_2.1.1/exomes/gnomad.exomes.r2.1.1.sites.vcf.bgz" 
+
+## Path to CADD database
+cadd: "/software/dataseq/databases/CADD/hg19/whole_genome_SNVs.tsv.gz"
+
+
+### Tools Parameters ###
+
+## QC ##
+
+FastQC:
+  params: "" # Optional: extra parameters for FastQC.
+
+MultiQC:
+  params: "" # Optional: extra parameters for MultiQC.
+
+## Mapping ##
+
+bwaMem:
+  threads: 20
+  params:
+    sort: "samtools" # Can be 'none', 'samtools' or 'picard'.
+    sort_order: "coordinate" # Can be 'queryname' or 'coordinate'.
+    sort_extra: "" # Extra args for samtools/picard.
+
+## Preprocess ##
+
+picard_AddOrReplaceGroups:
+  params: ""
+  mem_mb: 8192
+  library: ""
+  platform: ""
+  unit: ""
+
+picard_MarkDuplicates:
+  params: "ASSUME_SORTED=true REMOVE_DUPLICATES=false"
+  mem_mb: 8192
+
+gatk_BaseRecalibrator:
+  mem_mb: 16384
+  params:
+    extra: ""
+    java_opts: ""
+
+gatk_ApplyBQSR:
+  mem_mb: 8192
+  params:
+    extra: ""
+    java_opts: ""
+
+samtools_Index:
+  params: ""
+
+## Stats ##
+
+samtools_Stats:
+  extra: "" # Optional: extra arguments.
+  region: "" # Optional: region string.
+
+samtools_Depth:
+  extra: ""
+
+MeQC:
+  ranges: "1,2,3,5,10,20,30,50,100,500,1000,5000"
+
+bedtools_CoverageBed:
+  extra: "" # optional parameters
+  threads: 8
+
+iCoverage:
+  threshold: "30"
+
+## Variant Calling ##
+
+gatk_HaplotypeCaller:
+  params:
+    java_opts: "-Xmx16G"
+    extra: "--standard-min-confidence-threshold-for-calling 10.0 --sample-ploidy 2 --dont-use-soft-clipped-bases"
+
+gatk_CombineGvcfs:
+  params:
+    extra: ""
+    java_opts: ""
+
+gatk_GenotypeGvcfs:
+  threads: 10
+  params:
+    extra: "--standard-min-confidence-threshold-for-calling 10.0 --sample-ploidy 2" # optional
+    java_opts: "-Xmx4g"
+
+gatk_SelectVariants:
+  snps:
+    extra: "--select-type-to-include SNP --select-type-to-include MNP"
+    java_opts: ""
+  indel:
+    extra: "--select-type-to-include INDEL --select-type-to-include MIXED"
+    java_opts: ""
+
+gatk_FilterVariants:
+  snps:
+    filters:
+      {
+        "LowQualSNP": "QD < 2.0 || FS > 60.0 || MQ < 40.0 || MQRankSum < -12.5 || ReadPosRankSum < -8.0",
+        "100QUAL": "QUAL < 100"
+      }
+    extra: ""
+    java_opts: ""
+  indels:
+    filters: { "LowQualINDEL": "QD < 2.0 || FS > 200.0 || ReadPosRankSum < -20.0",
+              "100QUAL" : "QUAL < 100"
+     }
+    extra: ""
+    java_opts: ""
+
+picard_MergeVcfs:
+  extra: ""
+
+
+## Annotation ##
+
+snpsift_VarType:
+  params:
+    java_opts: "-Xmx50G"
+    extra: ""
+
+vep_annotate:
+  cache: "/software/dataseq/databases/vep/hg19/vep/cache" 
+  plugins: ["dbNSFP,/software/dataseq/databases/dbNSFP/4.1a/hg19/dbNSFP4.1a_grch37.gz,ALL", "CADD,/software/dataseq/databases/CADD/hg19/whole_genome_SNVs.tsv.gz"]
+  extra: "--everything --pick --refseq --custom /software/dataseq/databases/gnomAD/hg19_2.1.1/exomes/gnomad.exomes.r2.1.1.sites.vcf.bgz,gnomAD_211,vcf,exact,0,AF,AF_afr --custom /software/dataseq/databases/ClinVar/hg19/clinvar.vcf.gz,ClinVar,vcf,exact,0,CLNSIG,CLNVCSO,CLNREVSTAT,CLNDN,CLNVC,CLNVI,CLNDISDB,CLNHGVS,ORIGIN,MC,AF_EXAC,AF_ESP,AF_TGP"
+
+## Softwares path ##
+snpsift_path: "/scratch/miniconda3/envs/germinal_pipeline/share/snpsift-5.1-0/SnpSift.jar"
